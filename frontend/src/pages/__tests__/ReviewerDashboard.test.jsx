@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ReviewerDashboard } from '../ReviewerDashboard';
 import { AuditService } from '../../services/AuditService';
@@ -16,7 +16,8 @@ vi.mock('../../services/AuditService', () => ({
 vi.mock('../../services/RequestService', () => ({
     RequestService: {
         getRequests: vi.fn(),
-        verifyRequest: vi.fn()
+        verifyRequest: vi.fn(),
+        streamRequests: vi.fn()
     }
 }));
 
@@ -66,6 +67,33 @@ describe('ReviewerDashboard', () => {
         
         fireEvent.click(toggle);
         expect(AuditService.streamLogs).toHaveBeenCalled();
+    });
+
+    it('updates request status via stream in Reviewer Dashboard', async () => {
+        let requestCallback;
+        RequestService.streamRequests.mockImplementation(cb => {
+            requestCallback = cb;
+            return { close: vi.fn() };
+        });
+
+        render(<ReviewerDashboard />);
+        fireEvent.click(screen.getByText('Access Requests'));
+        await waitFor(() => expect(screen.getByText('req-1')).toBeInTheDocument());
+
+        // Enable live
+        fireEvent.click(screen.getByRole('checkbox'));
+        
+        // Wait for effect to run and set requestCallback
+        await waitFor(() => expect(RequestService.streamRequests).toHaveBeenCalled());
+        
+        // Simulate update to "VERIFIED"
+        fireEvent.change(screen.getByRole('checkbox'), { target: { checked: true } }); // Ensure state is synced
+        
+        await act(async () => {
+            requestCallback({ id: 'req-1', status: 'VERIFIED', resourcePath: 'main.db.t1' });
+        });
+        
+        await waitFor(() => expect(screen.getByText('VERIFIED')).toBeInTheDocument());
     });
 
     it('shows integrity placeholder', () => {

@@ -29,10 +29,24 @@ export const ReviewerDashboard = () => {
 
     useEffect(() => {
         let stream = null;
-        if (isLiveEnabled && selectedTab === 'AUDIT_LOG') {
-            stream = AuditService.streamLogs((newLog) => {
-                setAuditLogs(prev => [newLog, ...prev]);
-            });
+        if (isLiveEnabled) {
+            if (selectedTab === 'AUDIT_LOG') {
+                stream = AuditService.streamLogs((newLog) => {
+                    setAuditLogs(prev => [newLog, ...prev]);
+                });
+            } else if (selectedTab === 'REQUESTS') {
+                stream = RequestService.streamRequests((updatedReq) => {
+                    setRequests(prev => {
+                        const index = prev.findIndex(r => r.id === updatedReq.id);
+                        if (index !== -1) {
+                            const newRequests = [...prev];
+                            newRequests[index] = { ...newRequests[index], ...updatedReq };
+                            return newRequests;
+                        }
+                        return [updatedReq, ...prev];
+                    });
+                });
+            }
         }
         return () => stream?.close();
     }, [isLiveEnabled, selectedTab]);
