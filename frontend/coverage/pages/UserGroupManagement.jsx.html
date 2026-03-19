@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>41/41</span>
+                <span class='fraction'>43/43</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">66.66% </span>
+                <span class="strong">60% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>32/48</span>
+                <span class='fraction'>36/60</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>39/39</span>
+                <span class='fraction'>41/41</span>
             </div>
         
             
@@ -265,7 +265,9 @@
 <a name='L200'></a><a href='#L200'>200</a>
 <a name='L201'></a><a href='#L201'>201</a>
 <a name='L202'></a><a href='#L202'>202</a>
-<a name='L203'></a><a href='#L203'>203</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -400,6 +402,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">66x</span>
+<span class="cline-any cline-yes">66x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -443,6 +446,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
 <span class="cline-any cline-yes">24x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -600,9 +604,10 @@ export const UserGroupManagement = () =&gt; {
                                                         }}
                                                     &gt;
                                                         &lt;option value="" disabled className="dark:bg-gray-800"&gt;Change Persona...&lt;/option&gt;
-                                                        {personas.map(p =&gt; (
-                                                            &lt;option key={p} value={p} className="dark:bg-gray-800 "&gt;{p}&lt;/option&gt;
-                                                        ))}
+                                                        {personas.map(p =&gt; {
+                                                            const pId = typeof p === 'object' ? <span class="branch-0 cbranch-no" title="branch not covered" >p.id : p</span>;
+                                                            return &lt;option key={pId} value={pId} className="dark:bg-gray-800 "&gt;{typeof p === 'object' ? <span class="branch-0 cbranch-no" title="branch not covered" >p.name || p.id : p</span>}&lt;/option&gt;
+                                                        })}
                                                     &lt;/select&gt;
                                                 &lt;/div&gt;
                                             &lt;/td&gt;
@@ -644,9 +649,10 @@ export const UserGroupManagement = () =&gt; {
                                                         }}
                                                     &gt;
                                                         &lt;option value="" disabled className="dark:bg-gray-800"&gt;Change Persona...&lt;/option&gt;
-                                                        {personas.map(p =&gt; (
-                                                            &lt;option key={p} value={p} className="dark:bg-gray-800"&gt;{p}&lt;/option&gt;
-                                                        ))}
+                                                        {personas.map(p =&gt; {
+                                                            const pId = typeof p === 'object' ? <span class="branch-0 cbranch-no" title="branch not covered" >p.id : p</span>;
+                                                            return &lt;option key={pId} value={pId} className="dark:bg-gray-800 "&gt;{typeof p === 'object' ? <span class="branch-0 cbranch-no" title="branch not covered" >p.name || p.id : p</span>}&lt;/option&gt;
+                                                        })}
                                                     &lt;/select&gt;
                                                 &lt;/div&gt;
                                             &lt;/td&gt;
@@ -676,7 +682,7 @@ export const UserGroupManagement = () =&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-19T22:03:54.712Z
+                at 2026-03-19T22:13:20.305Z
             </div>
         <script src="../prettify.js"></script>
         <script>

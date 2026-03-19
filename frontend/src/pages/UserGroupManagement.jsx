@@ -131,9 +131,10 @@ export const UserGroupManagement = () => {
                                                         }}
                                                     >
                                                         <option value="" disabled className="dark:bg-gray-800">Change Persona...</option>
-                                                        {personas.map(p => (
-                                                            <option key={p} value={p} className="dark:bg-gray-800 ">{p}</option>
-                                                        ))}
+                                                        {personas.map(p => {
+                                                            const pId = typeof p === 'object' ? p.id : p;
+                                                            return <option key={pId} value={pId} className="dark:bg-gray-800 ">{typeof p === 'object' ? p.name || p.id : p}</option>
+                                                        })}
                                                     </select>
                                                 </div>
                                             </td>
@@ -175,9 +176,10 @@ export const UserGroupManagement = () => {
                                                         }}
                                                     >
                                                         <option value="" disabled className="dark:bg-gray-800">Change Persona...</option>
-                                                        {personas.map(p => (
-                                                            <option key={p} value={p} className="dark:bg-gray-800">{p}</option>
-                                                        ))}
+                                                        {personas.map(p => {
+                                                            const pId = typeof p === 'object' ? p.id : p;
+                                                            return <option key={pId} value={pId} className="dark:bg-gray-800 ">{typeof p === 'object' ? p.name || p.id : p}</option>
+                                                        })}
                                                     </select>
                                                 </div>
                                             </td>
