@@ -20,6 +20,7 @@ import { CatalogPage } from './pages/CatalogPage';
 import { ApproverDashboard } from './pages/ApproverDashboard';
 import { ReviewerDashboard } from './pages/ReviewerDashboard';
 import { SettingsPage } from './pages/SettingsPage';
+import { UserGroupManagement } from './pages/UserGroupManagement';
 import { AuthService } from './services/AuthService';
 
 const Sidebar = ({ activeTab, setActiveTab }) => (
@@ -51,6 +52,12 @@ const Sidebar = ({ activeTab, setActiveTab }) => (
         <a href="#" className={`nav-link group ${activeTab === 'audit' ? 'active' : ''}`} onClick={() => setActiveTab('audit')}>
           <Activity size={20} className="group-hover:scale-110 transition-transform" />
           Audit Logs
+        </a>
+      )}
+      {AuthService.hasRole('ADMIN') && (
+        <a href="#" className={`nav-link group ${activeTab === 'identity' ? 'active' : ''}`} onClick={() => setActiveTab('identity')}>
+          <Users size={20} className="group-hover:scale-110 transition-transform" />
+          Identity & Access
         </a>
       )}
     </nav>
@@ -193,6 +200,7 @@ const App = () => {
                 {activeTab === 'catalog' && <CatalogPage />}
                 {activeTab === 'approvals' && <ApproverDashboard />}
                 {activeTab === 'audit' && <ReviewerDashboard />}
+                {activeTab === 'identity' && <UserGroupManagement />}
                 {activeTab === 'settings' && <SettingsPage />}
               </div>
             )}
