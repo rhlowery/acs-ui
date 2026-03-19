@@ -15,6 +15,7 @@ import {
   XCircle,
   AlertCircle
 } from 'lucide-react';
+import { ThemeProvider } from './context/ThemeContext';
 import { CatalogPage } from './pages/CatalogPage';
 import { ApproverDashboard } from './pages/ApproverDashboard';
 import { ReviewerDashboard } from './pages/ReviewerDashboard';
@@ -22,114 +23,120 @@ import { SettingsPage } from './pages/SettingsPage';
 import { AuthService } from './services/AuthService';
 
 const Sidebar = ({ activeTab, setActiveTab }) => (
-  <div className="sidebar">
-    <div className="brand">
-      <Shield size={32} />
+  <aside className="w-[260px] bg-[var(--sidebar-bg)] border-r border-[var(--border)] p-6 flex flex-col gap-8 sticky top-0 h-screen transition-all duration-300">
+    <div className="brand flex items-center gap-2 text-2xl font-bold bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] bg-clip-text text-transparent">
+      <Shield size={32} className="text-[var(--primary)]" />
       <span>ACS UI</span>
     </div>
-    <div className="nav">
-      <a href="#" className={`nav-link ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>
-        <Activity size={20} />
+    <nav className="flex flex-col gap-2">
+      <a href="#" className={`nav-link group ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>
+        <Activity size={20} className="group-hover:scale-110 transition-transform" />
         Dashboard
       </a>
-      <a href="#" className={`nav-link ${activeTab === 'access-requests' ? 'active' : ''}`} onClick={() => setActiveTab('access-requests')}>
-        <Clock size={20} />
+      <a href="#" className={`nav-link group ${activeTab === 'access-requests' ? 'active' : ''}`} onClick={() => setActiveTab('access-requests')}>
+        <Clock size={20} className="group-hover:scale-110 transition-transform" />
         Access Requests
       </a>
-      <a href="#" className={`nav-link ${activeTab === 'catalog' ? 'active' : ''}`} onClick={() => setActiveTab('catalog')}>
-        <Database size={20} />
+      <a href="#" className={`nav-link group ${activeTab === 'catalog' ? 'active' : ''}`} onClick={() => setActiveTab('catalog')}>
+        <Database size={20} className="group-hover:scale-110 transition-transform" />
         Data Catalog
       </a>
       {AuthService.hasRole('APPROVER') && (
-        <a href="#" className={`nav-link ${activeTab === 'approvals' ? 'active' : ''}`} onClick={() => setActiveTab('approvals')}>
-          <CheckCircle2 size={20} />
+        <a href="#" className={`nav-link group ${activeTab === 'approvals' ? 'active' : ''}`} onClick={() => setActiveTab('approvals')}>
+          <CheckCircle2 size={20} className="group-hover:scale-110 transition-transform" />
           Approvals
         </a>
       )}
       {AuthService.hasRole('AUDITOR') && (
-        <a href="#" className={`nav-link ${activeTab === 'audit' ? 'active' : ''}`} onClick={() => setActiveTab('audit')}>
-          <Activity size={20} />
+        <a href="#" className={`nav-link group ${activeTab === 'audit' ? 'active' : ''}`} onClick={() => setActiveTab('audit')}>
+          <Activity size={20} className="group-hover:scale-110 transition-transform" />
           Audit Logs
         </a>
       )}
-    </div>
-    <div className="spacer" style={{ flex: 1 }}></div>
-    <div className="nav">
-      <a href="#" className={`nav-link ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
-        <Settings size={20} />
+    </nav>
+    <div className="flex-1"></div>
+    <nav className="flex flex-col gap-2">
+      <a href="#" className={`nav-link group ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
+        <Settings size={20} className="group-hover:rotate-45 transition-transform" />
         Settings
       </a>
-      <a href="#" className="nav-link" style={{ color: 'var(--danger)' }}>
-        <LogOut size={20} />
+      <a href="#" className="nav-link text-danger hover:bg-danger/10 group">
+        <LogOut size={20} className="group-hover:translate-x-1 transition-transform" />
         Logout
       </a>
-    </div>
-  </div>
+    </nav>
+  </aside>
 );
 
 const Header = ({ username }) => (
-  <div className="header">
-    <div className="search-bar glass" style={{ border: 'none', background: 'var(--glass-bg)', padding: '0.5rem 1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', borderRadius: '50px', width: '380px' }}>
-      <Search size={18} color="var(--text-muted)" />
-      <input type="text" placeholder="Search resources, requests..." style={{ background: 'transparent', border: 'none', color: 'var(--text)', width: '100%', outline: 'none' }} />
+  <header className="flex items-center justify-between p-6 bg-transparent">
+    <div className="search-bar glass px-6 py-2 flex items-center gap-3 w-[380px] hover:ring-2 ring-primary/20 transition-all">
+      <Search size={18} className="text-[var(--text-muted)]" />
+      <input 
+        type="text" 
+        placeholder="Search resources, requests..." 
+        className="bg-transparent border-none text-[var(--text)] w-full outline-none placeholder:text-gray-400 dark:placeholder:text-gray-600" 
+      />
     </div>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-      <Bell size={20} className="hover-pulse" style={{ cursor: 'pointer' }} />
-      <div className="user-profile glass">
-        <div className="avatar">{username?.charAt(0) || 'U'}</div>
-        <span style={{ fontWeight: 500 }}>{username || 'Anonymous User'}</span>
+    <div className="flex items-center gap-6">
+      <div className="relative cursor-pointer group">
+        <Bell size={20} className="group-hover:rotate-12 transition-transform" />
+        <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full ring-2 ring-background"></span>
+      </div>
+      <div className="user-profile glass flex items-center gap-3 px-3 py-1.5 hover:scale-105 transition-transform cursor-pointer">
+        <div className="avatar w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-accent flex items-center justify-center text-white font-bold text-sm">
+          {username?.charAt(0) || 'U'}
+        </div>
+        <span className="font-medium hidden sm:inline">{username || 'Anonymous User'}</span>
       </div>
     </div>
-  </div>
+  </header>
 );
 
 const Dashboard = ({ stats, requests }) => (
-  <div className="dashboard">
-    <div className="stat-group">
-      <div className="stat-card glass">
-        <span className="stat-label">Total Requests</span>
-        <span className="stat-value">{stats.total}</span>
+  <div className="dashboard-content space-y-8 p-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="stat-card glass p-6 border-l-4 border-primary group hover:translate-y-[-4px] transition-all">
+        <span className="stat-label block text-sm text-[var(--text-muted)] mb-1 uppercase tracking-wider font-bold">Total Requests</span>
+        <span className="stat-value text-3xl font-bold font-outfit">{stats.total}</span>
       </div>
-      <div className="stat-card glass" style={{ borderLeftColor: 'var(--warning)' }}>
-        <span className="stat-label">Pending Approval</span>
-        <span className="stat-value">{stats.pending}</span>
+      <div className="stat-card glass p-6 border-l-4 border-warning group hover:translate-y-[-4px] transition-all">
+        <span className="stat-label block text-sm text-[var(--text-muted)] mb-1 uppercase tracking-wider font-bold">Pending Approval</span>
+        <span className="stat-value text-3xl font-bold font-outfit">{stats.pending}</span>
       </div>
-      <div className="stat-card glass" style={{ borderLeftColor: 'var(--success)' }}>
-        <span className="stat-label">Active Permissions</span>
-        <span className="stat-value">{stats.active}</span>
+      <div className="stat-card glass p-6 border-l-4 border-success group hover:translate-y-[-4px] transition-all">
+        <span className="stat-label block text-sm text-[var(--text-muted)] mb-1 uppercase tracking-wider font-bold">Active Permissions</span>
+        <span className="stat-value text-3xl font-bold font-outfit">{stats.active}</span>
       </div>
     </div>
 
-    <h2 style={{ marginBottom: '1.5rem' }}>Recent Access Requests</h2>
-    <div className="card-grid">
-      {requests.map(req => (
-        <div key={req.id} className="card glass">
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-            <span className={`badge badge-${req.status === 'APPROVED' ? 'success' : req.status === 'PENDING' ? 'warning' : 'danger'}`}>
-              {req.status}
-            </span>
-            <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>{new Date(req.createdAt).toLocaleDateString()}</span>
+    <div>
+      <h2 className="text-2xl font-bold mb-6 font-outfit">Recent Access Requests</h2>
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {requests.map(req => (
+          <div key={req.id} className="card glass p-6 hover:ring-1 ring-primary/30 transition-all flex flex-col justify-between">
+            <div className="flex justify-between items-start mb-4">
+              <span className={`badge ${req.status === 'APPROVED' ? 'badge-success' : req.status === 'PENDING' ? 'badge-warning' : 'badge-danger'}`}>
+                {req.status}
+              </span>
+              <span className="text-[var(--text-muted)] text-[10px] uppercase font-bold tracking-tight">{new Date(req.createdAt).toLocaleDateString()}</span>
+            </div>
+            <div className="mb-6">
+              <h3 className="text-lg font-bold mb-1 line-clamp-1">{req.catalogName || 'Unknown Resource'}</h3>
+              <p className="text-[var(--text-muted)] text-sm italic">Requested by {req.requesterId}</p>
+            </div>
+            <div className="flex items-center justify-between mt-auto">
+               <span className="text-xs bg-[var(--text)]/5 px-2 py-1 rounded text-[var(--text-muted)] border border-[var(--border)]">
+                 {req.privileges?.join(', ') || 'No privileges'}
+               </span>
+               <button className="btn-secondary text-xs px-3 py-1.5">Details</button>
+            </div>
           </div>
-          <h3 style={{ marginBottom: '0.25rem' }}>{req.catalogName || 'Unknown Table'}</h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '1rem' }}>Requested by {req.requesterId}</p>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.875rem' }}>
-             <span>{req.privileges?.join(', ') || 'No privileges'}</span>
-             <button className="secondary" style={{ padding: '0.4rem 0.75rem', fontSize: '0.75rem' }}>View Details</button>
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   </div>
 );
-
-const EmptyState = ({ title, icon: Icon }) => (
-  <div className="glass" style={{ padding: '4rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', flex: 1 }}>
-    <Icon size={64} color="var(--text-muted)" style={{ marginBottom: '1.5rem', opacity: 0.3 }} />
-    <h2 style={{ marginBottom: '0.5rem' }}>{title}</h2>
-    <p style={{ color: 'var(--text-muted)', maxWidth: '400px' }}>This section is currently under development. Please check back later for updates.</p>
-    <button style={{ marginTop: '2rem' }}>Go Home</button>
-  </div>
-)
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -168,27 +175,31 @@ const App = () => {
   };
 
   return (
-    <div className="layout">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-      <div className="main-content">
-        <Header username={user?.userId || user?.name || (user?.email?.split('@')[0])} />
-        
-        {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-            <Activity size={48} color="var(--primary)" className="spin" />
+    <ThemeProvider>
+      <div className="flex min-h-screen bg-background text-[var(--text)] transition-colors duration-300">
+        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <main className="flex-1 flex flex-col overflow-hidden">
+          <Header username={user?.userId || user?.name || (user?.email?.split('@')[0])} />
+          
+          <div className="flex-1 overflow-auto custom-scrollbar">
+            {loading ? (
+              <div className="flex items-center justify-center h-[60vh]">
+                <Activity size={48} className="text-primary spin-slow" />
+              </div>
+            ) : (
+              <div className="max-w-7xl mx-auto w-full">
+                {activeTab === 'dashboard' && <Dashboard stats={stats} requests={requests.slice(0, 3)} />}
+                {activeTab === 'access-requests' && <Dashboard stats={stats} requests={requests} />}
+                {activeTab === 'catalog' && <CatalogPage />}
+                {activeTab === 'approvals' && <ApproverDashboard />}
+                {activeTab === 'audit' && <ReviewerDashboard />}
+                {activeTab === 'settings' && <SettingsPage />}
+              </div>
+            )}
           </div>
-        ) : (
-          <>
-            {activeTab === 'dashboard' && <Dashboard stats={stats} requests={requests.slice(0, 3)} />}
-            {activeTab === 'access-requests' && <Dashboard stats={stats} requests={requests} />}
-            {activeTab === 'catalog' && <CatalogPage />}
-            {activeTab === 'approvals' && <ApproverDashboard />}
-            {activeTab === 'audit' && <ReviewerDashboard />}
-            {activeTab === 'settings' && <SettingsPage />}
-          </>
-        )}
+        </main>
       </div>
-    </div>
+    </ThemeProvider>
   );
 };
 

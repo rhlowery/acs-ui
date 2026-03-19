@@ -61,10 +61,10 @@ describe('ApproverDashboard', () => {
     
     expect(screen.getByText('Confirm Rejection')).toBeInTheDocument();
     
-    const textarea = screen.getByPlaceholderText(/e.g., Access/);
+    const textarea = screen.getByPlaceholderText(/e.g., Request doesn't/);
     fireEvent.change(textarea, { target: { value: 'forbidden' } });
     
-    const confirmBtn = screen.getByText('Reject', { selector: 'button.primary' });
+    const confirmBtn = screen.getByText('Reject Access');
     fireEvent.click(confirmBtn);
     
     expect(RequestService.rejectRequest).toHaveBeenCalledWith('req-1', 'forbidden');
@@ -76,7 +76,7 @@ describe('ApproverDashboard', () => {
     await waitFor(() => expect(screen.getByText('user1')).toBeInTheDocument());
     
     fireEvent.click(screen.getByTitle('Reject access'));
-    const confirmBtn = screen.getByText('Reject', { selector: 'button.primary' });
+    const confirmBtn = screen.getByText('Reject Access');
     fireEvent.click(confirmBtn);
     
     expect(global.alert).toHaveBeenCalledWith('Rejection reason is required.');
@@ -107,8 +107,8 @@ describe('ApproverDashboard', () => {
     await waitFor(() => expect(screen.getByText('user1')).toBeInTheDocument());
     
     fireEvent.click(screen.getByTitle('Reject access'));
-    fireEvent.change(screen.getByPlaceholderText(/e.g., Access/), { target: { value: 'some reason' } });
-    fireEvent.click(screen.getByText('Reject', { selector: 'button.primary' }));
+    fireEvent.change(screen.getByPlaceholderText(/e.g., Request doesn't/), { target: { value: 'some reason' } });
+    fireEvent.click(screen.getByText('Reject Access'));
     
     await waitFor(() => expect(global.alert).toHaveBeenCalledWith('Backend error 2'));
   });

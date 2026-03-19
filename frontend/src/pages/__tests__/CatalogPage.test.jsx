@@ -30,7 +30,7 @@ describe('CatalogPage', () => {
   it('renders invitation to select a resource initially', async () => {
     CatalogService.getRegistrations.mockResolvedValueOnce([]);
     render(<CatalogPage />);
-    expect(screen.getByText('No Resource Selected')).toBeInTheDocument();
+    expect(screen.getByText('Begin Exploration')).toBeInTheDocument();
   });
 
   it('updates breadcrumbs and details when a node is selected', async () => {
@@ -43,7 +43,7 @@ describe('CatalogPage', () => {
     // Breadcrumb should update - check for 'Catalog' and 'main'
     expect(screen.getByText('Catalog')).toBeInTheDocument();
     expect(screen.getAllByText('main')[0]).toBeInTheDocument();
-    expect(screen.getByText('You have SELECT access')).toBeInTheDocument();
+    expect(screen.getByText('Full SELECT privileges detected')).toBeInTheDocument();
   });
 
   it('handles table selection and type-specific rendering', async () => {
@@ -57,7 +57,7 @@ describe('CatalogPage', () => {
     // Line 29: setBreadcrumbPath(['main', ...newPath]);
     expect(screen.getByText('main')).toBeInTheDocument();
     expect(screen.getAllByText('users')[0]).toBeInTheDocument();
-    expect(screen.getByText('TABLE • default/users')).toBeInTheDocument();
+    expect(screen.getAllByText('TABLE')[0]).toBeInTheDocument();
   });
 
   it('triggers right-click and opens access request form', async () => {
@@ -87,7 +87,7 @@ describe('CatalogPage', () => {
     fireEvent.click(screen.getByText('Select Table'));
     
     // Preview should exist for tables
-    expect(screen.getByText('Preview (Mock)')).toBeInTheDocument();
+    expect(screen.getByText('Schema Preview')).toBeInTheDocument();
     expect(screen.getByText('TIMESTAMP')).toBeInTheDocument();
   });
 });
