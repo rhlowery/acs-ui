@@ -45,24 +45,24 @@ Feature: Catalog Tree Explorer
       | schema  | default  | main/default | Catalog > main > default |
       | table   | users    | main/default/users | Catalog > main > default > users |
 
-  Scenario Outline: Quick Action: Request permissions for self
+  Scenario Outline: Quick Action: Request permissions for self in top-level Provisioning Terminal
     Given the user is at <type> "<nodePath>" in the tree
     When the user right-clicks the <type> node
     And selects "Request Access For Me" from the context menu
-    Then the Access Request form should open
-    And the "Principal" field should be pre-filled with the current user's ID
-    And the "Resource" field should be set to "<nodePath>"
+    Then the "Provisioning Terminal" should open in the side panel
+    And the current user's ID should be pre-filled in the "Principal" selection
+    And the target resource should be set to "<nodePath>"
 
     Examples:
       | type    | nodePath            |
       | table   | main.default.users  |
       | schema  | main.sales          |
 
-  Scenario: Multi-selection of resources
+  Scenario: Multi-selection of resources for batch provisioning
     Given the user has expanded several catalogs and schemas
     When the user selects the checkbox for table "users" and "orders"
     Then both resources should be highlighted in the tree
-    And the summary panel should show "2 resources selected"
+    And the "Provisioning Terminal" summary should show "2 Targets" selected
 
   Scenario: Searching within the catalog tree
     Given the user is in the "Data Catalog" section

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Database, ChevronRight, CheckCircle2, Shield, Info } from 'lucide-react';
+import { Database, ChevronRight, CheckCircle2, Shield, Info, Terminal } from 'lucide-react';
 import { CatalogTree } from '../components/catalog/CatalogTree';
+import { AccessForm } from '../components/access-form/AccessForm';
 
 const Breadcrumbs = ({ path }) => {
   const parts = ['Catalog', ...path.filter(p => p)];
@@ -19,35 +20,50 @@ const Breadcrumbs = ({ path }) => {
 export const CatalogPage = () => {
   const [selectedNode, setSelectedNode] = useState(null);
   const [breadcrumbPath, setBreadcrumbPath] = useState([]);
+  const [selectedObjects, setSelectedObjects] = useState([]);
+  const [showTerminal, setShowTerminal] = useState(false);
 
   const handleSelect = (node) => {
     setSelectedNode(node);
-    // Construct breadcrumb path (simplified for this demonstration)
-    const newPath = node.path.split('/').filter(p => p);
+    const newPath = (node.path || '').split('/').filter(p => p);
     if (node.type !== 'catalog') {
-      // Catalog ID would normally be the first part
       setBreadcrumbPath(['main', ...newPath]);
     } else {
       setBreadcrumbPath([node.name]);
     }
   };
 
+  const handleToggle = (node) => {
+    setSelectedObjects(prev => {
+        const isSelected = prev.find(obj => obj.id === node.id || (obj.path === node.path && obj.name === node.name));
+        if (isSelected) {
+            return prev.filter(obj => obj.id !== node.id && !(obj.path === node.path && obj.name === node.name));
+        }
+        return [...prev, node];
+    });
+    if (!showTerminal) setShowTerminal(true);
+  };
+
   const handleRightClick = (e, node) => {
-    // Context menu logic could go here
     console.log('Right click on', node);
+    // Shortcut for "Request Access For Me"
+    if (!selectedObjects.find(o => o.name === node.name)) {
+        setSelectedObjects(prev => [...prev, node]);
+    }
+    setShowTerminal(true);
   };
 
   return (
-    <div className="catalog-page" style={{ display: 'flex', gap: '2rem', height: '100%' }}>
-      <div className="catalog-sidebar" style={{ width: '300px', flexShrink: 0 }}>
-        <CatalogTree onSelect={handleSelect} onRightClick={handleRightClick} />
+    <div className="catalog-page" style={{ display: 'flex', gap: '1rem', height: '100%', overflow: 'hidden' }}>
+      <div className="catalog-sidebar" style={{ width: '280px', flexShrink: 0, overflowY: 'auto' }}>
+        <CatalogTree onSelect={handleSelect} onRightClick={handleRightClick} onToggle={handleToggle} />
       </div>
 
-      <div className="catalog-main" style={{ flex: 1 }}>
+      <div className="catalog-main" style={{ flex: 1, overflowY: 'auto', paddingRight: showTerminal ? '0' : '1rem' }}>
         <Breadcrumbs path={breadcrumbPath} />
         
         {selectedNode ? (
-          <div className="details-view glass" style={{ padding: '2rem' }}>
+          <div className="details-view glass" style={{ padding: '2rem', marginBottom: '2rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
                <Database size={32} color="var(--primary)" />
                <div>
@@ -55,13 +71,13 @@ export const CatalogPage = () => {
                  <p style={{ color: 'var(--text-muted)' }}>{selectedNode.type.toUpperCase()} • {selectedNode.path || '/'}</p>
                </div>
                <div style={{ marginLeft: 'auto' }}>
-                 <button className="primary" onClick={() => alert(`Requesting access for ${selectedNode.name}`)}>
-                   Request Access
+                 <button className="primary" onClick={() => handleToggle(selectedNode)}>
+                   {selectedObjects.find(o => o.name === selectedNode.name) ? 'Remove from Request' : 'Add to Request'}
                  </button>
                </div>
             </div>
 
-            <div className="card-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+            <div className="card-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', display: 'grid', gap: '1rem' }}>
               <div className="card glass">
                 <Shield size={20} style={{ marginBottom: '0.5rem' }} />
                 <h3>Permissions</h3>
@@ -102,13 +118,28 @@ export const CatalogPage = () => {
             )}
           </div>
         ) : (
-          <div className="glass" style={{ padding: '4rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+          <div className="glass" style={{ padding: '4rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', margin: '2rem' }}>
             <Database size={64} style={{ opacity: 0.1, marginBottom: '2rem' }} />
             <h2>Select a resource to browse</h2>
             <p style={{ color: 'var(--text-muted)' }}>Use the catalog tree on the left to navigate through schemas and tables.</p>
           </div>
         )}
       </div>
+
+      {showTerminal && (
+          <div className="provisioning-panel glass" style={{ width: '450px', flexShrink: 0, borderLeft: '1px solid rgba(255,255,255,0.1)', overflowY: 'auto', padding: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+                  <button onClick={() => setShowTerminal(false)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>
+                    <ChevronRight size={20} />
+                  </button>
+              </div>
+              <AccessForm 
+                selectedObjects={selectedObjects} 
+                onClearSelection={() => setSelectedObjects([])}
+                onSubmit={() => {}}
+              />
+          </div>
+      )}
     </div>
   );
 };

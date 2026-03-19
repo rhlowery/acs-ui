@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { CatalogService } from '../../services/CatalogService';
 
-const TreeNode = ({ node, catalogId, level = 0, onSelect, onRightClick }) => {
+const TreeNode = ({ node, catalogId, level = 0, onSelect, onRightClick, onToggle }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [children, setChildren] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -57,6 +57,16 @@ const TreeNode = ({ node, catalogId, level = 0, onSelect, onRightClick }) => {
             loading ? <div className="spinner-mini" /> : (isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />)
           )}
         </span>
+        <input 
+          type="checkbox" 
+          checked={node.isSelected || false}
+          onChange={(e) => {
+            e.stopPropagation();
+            onToggle(node);
+          }}
+          className="node-checkbox"
+          style={{ marginRight: '8px', cursor: 'pointer' }}
+        />
         <span className="node-icon">{nodeIcon}</span>
         <span className="node-label">{node.name}</span>
         <span className="node-meta" style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
@@ -74,6 +84,7 @@ const TreeNode = ({ node, catalogId, level = 0, onSelect, onRightClick }) => {
               level={level + 1} 
               onSelect={onSelect}
               onRightClick={onRightClick}
+              onToggle={onToggle}
             />
           ))}
         </div>
@@ -82,7 +93,7 @@ const TreeNode = ({ node, catalogId, level = 0, onSelect, onRightClick }) => {
   );
 };
 
-export const CatalogTree = ({ onSelect, onRightClick }) => {
+export const CatalogTree = ({ onSelect, onRightClick, onToggle }) => {
   const [catalogs, setCatalogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -122,6 +133,7 @@ export const CatalogTree = ({ onSelect, onRightClick }) => {
             level={0} 
             onSelect={onSelect}
             onRightClick={onRightClick}
+            onToggle={onToggle}
           />
         ))}
       </div>

@@ -13,18 +13,26 @@ vi.mock('../../services/CatalogService', () => ({
 }));
 
 vi.mock('../../components/catalog/CatalogTree', () => ({
-  CatalogTree: ({ onSelect, onRightClick }) => (
+  CatalogTree: ({ onSelect, onRightClick, onToggle }) => (
     <div data-testid="mock-catalog-tree">
       <button onClick={() => onSelect({ id: 'c1', name: 'main', type: 'catalog', path: '/', access: 'SELECT' })}>Select Catalog</button>
       <button onClick={() => onSelect({ id: 't1', name: 'users', type: 'table', path: 'default/users', access: 'NONE' })}>Select Table</button>
-      <button onContextMenu={(e) => { e.preventDefault(); onRightClick(e, { name: 'test-node' }); }}>Right Click Node</button>
+      <button onClick={() => onToggle({ id: 't1', name: 'users', type: 'table', path: 'default/users', access: 'NONE' })}>Toggle Table</button>
+      <button onContextMenu={(e) => { e.preventDefault(); onRightClick(e, { id: 'test-id', name: 'test-node', type: 'table', path: 'default/test' }); }}>Right Click Node</button>
     </div>
   )
 }));
 
+import { http, HttpResponse } from 'msw';
+import { server } from '../../test/setup';
+
 describe('CatalogPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    server.use(
+      http.get('/api/users', () => HttpResponse.json([])),
+      http.get('/api/groups', () => HttpResponse.json([]))
+    );
   });
 
   it('renders invitation to select a resource initially', async () => {
@@ -60,8 +68,7 @@ describe('CatalogPage', () => {
     expect(screen.getByText('TABLE • default/users')).toBeInTheDocument();
   });
 
-  it('triggers right-click and access request alert', async () => {
-    window.alert = vi.fn();
+  it('triggers right-click and opens provisioning terminal', async () => {
     const consoleSpy = vi.spyOn(console, 'log');
     
     CatalogService.getRegistrations.mockResolvedValueOnce([]);
@@ -72,11 +79,8 @@ describe('CatalogPage', () => {
     fireEvent.contextMenu(rightClickBtn);
     expect(consoleSpy).toHaveBeenCalledWith('Right click on', expect.objectContaining({ name: 'test-node' }));
     
-    // Select a node restricted access and click request button
-    fireEvent.click(screen.getByText('Select Table'));
-    const requestBtn = screen.getByText('Request Access');
-    fireEvent.click(requestBtn);
-    expect(window.alert).toHaveBeenCalled();
+    // Provisioning Terminal should appear
+    expect(screen.getByText(/Provisioning Terminal/i)).toBeInTheDocument();
   });
 
   it('renders table-specific preview', async () => {
@@ -88,5 +92,27 @@ describe('CatalogPage', () => {
     // Preview should exist for tables
     expect(screen.getByText('Preview (Mock)')).toBeInTheDocument();
     expect(screen.getByText('TIMESTAMP')).toBeInTheDocument();
+  });
+
+  it('handles toggling objects for the provisioning terminal', async () => {
+    CatalogService.getRegistrations.mockResolvedValueOnce([]);
+    render(<CatalogPage />);
+    
+    // Select table to show detail view
+    fireEvent.click(screen.getByText('Select Table'));
+    
+    // Add to request
+    const addBtn = screen.getByText('Add to Request');
+    fireEvent.click(addBtn);
+    
+    // Button should change label
+    expect(screen.getByText('Remove from Request')).toBeInTheDocument();
+    
+    // Terminal should be open
+    expect(screen.getByText(/Provisioning Terminal/i)).toBeInTheDocument();
+    
+    // Remove from request
+    fireEvent.click(screen.getByText('Remove from Request'));
+    expect(screen.getByText('Add to Request')).toBeInTheDocument();
   });
 });
