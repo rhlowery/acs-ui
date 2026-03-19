@@ -23,9 +23,13 @@ describe('SettingsPage', () => {
     it('toggles checkboxes', () => {
         render(<SettingsPage />);
         const checkboxes = screen.getAllByRole('checkbox');
-        expect(checkboxes[0].checked).toBe(true); // Stream
-        fireEvent.click(checkboxes[0]);
-        expect(checkboxes[0].checked).toBe(false);
+        expect(checkboxes.length).toBe(2);
+        
+        checkboxes.forEach(cb => {
+            expect(cb.checked).toBe(true);
+            fireEvent.click(cb);
+            expect(cb.checked).toBe(false);
+        });
     });
 
     it('handles save', () => {

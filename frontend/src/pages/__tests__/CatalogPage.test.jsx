@@ -30,7 +30,7 @@ describe('CatalogPage', () => {
   it('renders invitation to select a resource initially', async () => {
     CatalogService.getRegistrations.mockResolvedValueOnce([]);
     render(<CatalogPage />);
-    expect(screen.getByText('Select a resource to browse')).toBeInTheDocument();
+    expect(screen.getByText('No Resource Selected')).toBeInTheDocument();
   });
 
   it('updates breadcrumbs and details when a node is selected', async () => {
@@ -60,8 +60,7 @@ describe('CatalogPage', () => {
     expect(screen.getByText('TABLE • default/users')).toBeInTheDocument();
   });
 
-  it('triggers right-click and access request alert', async () => {
-    window.alert = vi.fn();
+  it('triggers right-click and opens access request form', async () => {
     const consoleSpy = vi.spyOn(console, 'log');
     
     CatalogService.getRegistrations.mockResolvedValueOnce([]);
@@ -76,7 +75,9 @@ describe('CatalogPage', () => {
     fireEvent.click(screen.getByText('Select Table'));
     const requestBtn = screen.getByText('Request Access');
     fireEvent.click(requestBtn);
-    expect(window.alert).toHaveBeenCalled();
+    
+    // Should now show the form modal
+    expect(screen.getByText('Principal (User ID)')).toBeInTheDocument();
   });
 
   it('renders table-specific preview', async () => {

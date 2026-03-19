@@ -96,6 +96,47 @@ describe('ReviewerDashboard', () => {
         await waitFor(() => expect(screen.getByText('VERIFIED')).toBeInTheDocument());
     });
 
+    it('adds a new request via stream in Reviewer Dashboard', async () => {
+        let requestCallback;
+        RequestService.streamRequests.mockImplementation(cb => {
+            requestCallback = cb;
+            return { close: vi.fn() };
+        });
+
+        render(<ReviewerDashboard />);
+        fireEvent.click(screen.getByText('Access Requests'));
+        await waitFor(() => expect(screen.getByText('req-1')).toBeInTheDocument());
+
+        fireEvent.click(screen.getByRole('checkbox'));
+        await waitFor(() => expect(RequestService.streamRequests).toHaveBeenCalled());
+        
+        await act(async () => {
+            requestCallback({ id: 'req-new', status: 'PENDING', resourcePath: 'new.db.t1' });
+        });
+        
+        await waitFor(() => expect(screen.getByText('req-new')).toBeInTheDocument());
+    });
+
+    it('updates audit logs via stream', async () => {
+        let logCallback;
+        AuditService.streamLogs.mockImplementation(cb => {
+            logCallback = cb;
+            return { close: vi.fn() };
+        });
+
+        render(<ReviewerDashboard />);
+        // Enable live
+        fireEvent.click(screen.getByRole('checkbox'));
+        
+        await waitFor(() => expect(AuditService.streamLogs).toHaveBeenCalled());
+        
+        await act(async () => {
+            logCallback({ id: 'log-2', timestamp: Date.now(), principalId: 'user2', action: 'LOGOUT', resourcePath: 'System', result: 'SUCCESS' });
+        });
+        
+        await waitFor(() => expect(screen.getByText('LOGOUT')).toBeInTheDocument());
+    });
+
     it('shows integrity placeholder', () => {
         render(<ReviewerDashboard />);
         fireEvent.click(screen.getByText('Resource Integrity'));

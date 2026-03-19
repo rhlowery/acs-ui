@@ -45,28 +45,28 @@ Feature: Catalog Tree Explorer
       | schema  | default  | main/default | Catalog > main > default |
       | table   | users    | main/default/users | Catalog > main > default > users |
 
-  Scenario Outline: Quick Action: Request permissions for self
-    Given the user is at <type> "<nodePath>" in the tree
-    When the user right-clicks the <type> node
-    And selects "Request Access For Me" from the context menu
-    Then the Access Request form should open
-    And the "Principal" field should be pre-filled with the current user's ID
-    And the "Resource" field should be set to "<nodePath>"
+  Scenario Outline: Advanced Access Request Workflow
+    Given the user has selected the <type> "<nodeName>" at path "<path>"
+    When the user clicks the "Request Access" button in the details panel
+    Then the "Request Access" modal should appear
+    And the "Principal" input should be pre-filled with the current user's ID
+    And the "Resource Path" input should show "<fullPath>"
+    And the user selects privileges "<privileges>"
+    And the user enters justification "need for audit"
+    And the user optionally sets expiration to "<expiry>"
+    And clicks "Submit Request"
+    Then the request should be sent to "/api/storage/requests" via POST
+    And a success message "Access request submitted successfully!" should be displayed
+    And the modal should automatically close
 
     Examples:
-      | type    | nodePath            |
-      | table   | main.default.users  |
-      | schema  | main.sales          |
-
-  Scenario: Multi-selection of resources
-    Given the user has expanded several catalogs and schemas
-    When the user selects the checkbox for table "users" and "orders"
-    Then both resources should be highlighted in the tree
-    And the summary panel should show "2 resources selected"
+      | type    | nodeName | path         | fullPath           | privileges         | expiry           |
+      | table   | users    | main/default | main/default/users | SELECT, UPDATE     | 2026-12-31T23:59 |
+      | schema  | finance  | main         | main/finance       | SELECT, USE_SCHEMA |                  |
+      | catalog | sales    | /            | sales              | USE_CATALOG        |                  |
 
   Scenario: Searching within the catalog tree
     Given the user is in the "Data Catalog" section
     When the user types "sales" into the catalog search bar
     Then the tree should filter to show only nodes matching "sales"
     And parent nodes of matches should be automatically expanded to reveal the results
-
