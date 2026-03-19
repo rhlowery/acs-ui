@@ -19,11 +19,15 @@ Feature: Reviewer Dashboard
       | Audit Log  | /api/audit/log         | 5          | EVENT_TYPE |
       | Requests   | /api/storage/requests  | 8          | REQ_STATUS |
 
-  Scenario: Toggling live-stream for audit logs
-    Given the administrator has toggled "Live-Feed" feature to ON
-    When the user toggles the local "Live Stream" switch to "ON"
-    Then the UI should connect to the Server-Sent Events (SSE) endpoint at "/api/audit/log/stream"
-    And new audit events from all activities should append to the log in real-time
+  Scenario Outline: Toggling live-stream for audit logs
+    Given the administrator has toggled "<feature>" feature to ON
+    When the user toggles the local "<control>" switch to "ON"
+    Then the UI should connect to the Server-Sent Events (SSE) endpoint at "<endpoint>"
+    And new events from all activities should append to the log in real-time
+
+    Examples:
+      | feature   | control      | endpoint                |
+      | Live-Feed | Live Stream  | /api/audit/log/stream   |
 
   Scenario Outline: Verifying access request processing
     Given there is a recently processed request with ID "<requestId>"

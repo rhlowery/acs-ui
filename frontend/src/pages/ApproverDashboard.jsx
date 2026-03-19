@@ -27,8 +27,16 @@ export const ApproverDashboard = () => {
     useEffect(() => {
         let stream = null;
         if (isLiveEnabled) {
-            stream = RequestService.streamRequests((newReq) => {
-                setRequests(prev => [newReq, ...prev]);
+            stream = RequestService.streamRequests((updatedReq) => {
+                setRequests(prev => {
+                    const index = prev.findIndex(r => r.id === updatedReq.id);
+                    if (index !== -1) {
+                        const newRequests = [...prev];
+                        newRequests[index] = { ...newRequests[index], ...updatedReq };
+                        return newRequests;
+                    }
+                    return [updatedReq, ...prev];
+                });
             });
         }
         return () => stream?.close();

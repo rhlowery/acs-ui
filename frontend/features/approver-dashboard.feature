@@ -35,8 +35,12 @@ Feature: Approver Dashboard
       | req-101   | main.default.users  | approve | APPROVED  |
       | req-102   | sales.raw.orders    | reject  | REJECTED  |
 
-  Scenario: Toggling live-stream for pending requests
-    Given the administrator has toggled "Live-Feed" feature to ON
-    When the user toggles the local "Live Stream" switch to "ON"
-    Then the UI should connect to the Server-Sent Events (SSE) endpoint at "/api/storage/requests/stream"
-    And new requests for the user's catalogs should appear in the table in real-time
+  Scenario Outline: Toggling live-stream for pending requests
+    Given the administrator has toggled "<feature>" feature to ON
+    When the user toggles the local "<control>" switch to "ON"
+    Then the UI should connect to the Server-Sent Events (SSE) endpoint at "<endpoint>"
+    And new records should appear in the table in real-time
+
+    Examples:
+      | feature   | control      | endpoint                        |
+      | Live-Feed | Live Stream  | /api/storage/requests/stream    |

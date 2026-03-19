@@ -120,4 +120,26 @@ describe('ApproverDashboard', () => {
     fireEvent.click(toggle);
     expect(RequestService.streamRequests).toHaveBeenCalled();
   });
+
+  it('updates existing request when SSE event arrives', async () => {
+    let streamCallback;
+    RequestService.streamRequests.mockImplementation((cb) => {
+      streamCallback = cb;
+      return { close: vi.fn() };
+    });
+    
+    render(<ApproverDashboard />);
+    await waitFor(() => expect(screen.getByText('user1')).toBeInTheDocument());
+    
+    // Enable live
+    fireEvent.click(screen.getByRole('checkbox'));
+    
+    // Simulate update to req-1 (making it APPROVED)
+    fireEvent.click(screen.getByText('APPROVED')); // Switch tab to see it disappear/appear
+    expect(screen.queryByText('user1')).not.toBeInTheDocument();
+    
+    streamCallback({ id: 'req-1', principalId: 'user1', status: 'APPROVED' });
+    
+    await waitFor(() => expect(screen.getByText('user1')).toBeInTheDocument());
+  });
 });
