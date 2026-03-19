@@ -200,6 +200,87 @@ button.secondary:hover {
     margin-bottom: 2.5rem;
 }
 
+/* Catalog Tree */
+.catalog-tree {
+  height: calc(100vh - 200px);
+  overflow-y: auto;
+  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  padding: 1rem;
+}
+
+.tree-node {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+  font-size: 0.875rem;
+}
+
+.tree-node:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tree-node.active {
+  background: hsla(230, 85%, 60%, 0.1); /* Assuming --primary-light is meant to be a lighter primary */
+  color: var(--primary);
+}
+
+.expand-icon {
+  width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 4px;
+  color: var(--text-muted);
+}
+
+.node-icon {
+  margin-right: 10px;
+  color: var(--primary);
+}
+
+.node-label {
+  flex: 1;
+}
+
+.tree-children {
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  margin-left: 10px;
+}
+
+.spinner-mini {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--text-muted);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.breadcrumb-item:last-child {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.breadcrumb-separator {
+  opacity: 0.3;
+}
+
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
