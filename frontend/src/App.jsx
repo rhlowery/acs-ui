@@ -16,6 +16,10 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { CatalogPage } from './pages/CatalogPage';
+import { ApproverDashboard } from './pages/ApproverDashboard';
+import { ReviewerDashboard } from './pages/ReviewerDashboard';
+import { SettingsPage } from './pages/SettingsPage';
+import { AuthService } from './services/AuthService';
 
 const Sidebar = ({ activeTab, setActiveTab }) => (
   <div className="sidebar">
@@ -36,14 +40,22 @@ const Sidebar = ({ activeTab, setActiveTab }) => (
         <Database size={20} />
         Data Catalog
       </a>
-      <a href="#" className={`nav-link ${activeTab === 'audit' ? 'active' : ''}`} onClick={() => setActiveTab('audit')}>
-        <Users size={20} />
-        Audit Logs
-      </a>
+      {AuthService.hasRole('APPROVER') && (
+        <a href="#" className={`nav-link ${activeTab === 'approvals' ? 'active' : ''}`} onClick={() => setActiveTab('approvals')}>
+          <CheckCircle2 size={20} />
+          Approvals
+        </a>
+      )}
+      {AuthService.hasRole('AUDITOR') && (
+        <a href="#" className={`nav-link ${activeTab === 'audit' ? 'active' : ''}`} onClick={() => setActiveTab('audit')}>
+          <Activity size={20} />
+          Audit Logs
+        </a>
+      )}
     </div>
     <div className="spacer" style={{ flex: 1 }}></div>
     <div className="nav">
-      <a href="#" className="nav-link">
+      <a href="#" className={`nav-link ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
         <Settings size={20} />
         Settings
       </a>
@@ -170,7 +182,9 @@ const App = () => {
             {activeTab === 'dashboard' && <Dashboard stats={stats} requests={requests.slice(0, 3)} />}
             {activeTab === 'access-requests' && <Dashboard stats={stats} requests={requests} />}
             {activeTab === 'catalog' && <CatalogPage />}
-            {activeTab === 'audit' && <EmptyState title="Audit Logs" icon={Activity} />}
+            {activeTab === 'approvals' && <ApproverDashboard />}
+            {activeTab === 'audit' && <ReviewerDashboard />}
+            {activeTab === 'settings' && <SettingsPage />}
           </>
         )}
       </div>
