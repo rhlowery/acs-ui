@@ -158,8 +158,15 @@ const App = () => {
         if (userRes.ok) {
           const userData = await userRes.json();
           setUser(userData);
+        } else {
+          setUser(AuthService.getCurrentUser());
         }
-
+      } catch (err) {
+        setUser(AuthService.getCurrentUser());
+        console.error('Failed to fetch user data', err);
+      }
+      
+      try {
         const reqRes = await fetch('/api/storage/requests');
         if (reqRes.ok) {
           const reqData = await reqRes.json();
