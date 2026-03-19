@@ -15,6 +15,7 @@ import {
   XCircle,
   AlertCircle
 } from 'lucide-react';
+import { CatalogPage } from './pages/CatalogPage';
 
 const Sidebar = ({ activeTab, setActiveTab }) => (
   <div className="sidebar">
@@ -168,7 +169,7 @@ const App = () => {
           <>
             {activeTab === 'dashboard' && <Dashboard stats={stats} requests={requests.slice(0, 3)} />}
             {activeTab === 'access-requests' && <Dashboard stats={stats} requests={requests} />}
-            {activeTab === 'catalog' && <EmptyState title="Data Catalog" icon={Database} />}
+            {activeTab === 'catalog' && <CatalogPage />}
             {activeTab === 'audit' && <EmptyState title="Audit Logs" icon={Activity} />}
           </>
         )}
