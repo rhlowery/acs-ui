@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ApproverDashboard } from '../ApproverDashboard';
 import { RequestService } from '../../services/RequestService';
@@ -138,8 +138,34 @@ describe('ApproverDashboard', () => {
     fireEvent.click(screen.getByText('APPROVED')); // Switch tab to see it disappear/appear
     expect(screen.queryByText('user1')).not.toBeInTheDocument();
     
-    streamCallback({ id: 'req-1', principalId: 'user1', status: 'APPROVED' });
+    await act(async () => {
+      streamCallback({ id: 'req-1', principalId: 'user1', status: 'APPROVED' });
+    });
     
     await waitFor(() => expect(screen.getByText('user1')).toBeInTheDocument());
+  });
+
+  it('adds a new request when SSE event arrives with unknown ID', async () => {
+    let streamCallback;
+    RequestService.streamRequests.mockImplementation((cb) => {
+      streamCallback = cb;
+      return { close: vi.fn() };
+    });
+    
+    render(<ApproverDashboard />);
+    await waitFor(() => expect(screen.getByText('user1')).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('checkbox'));
+    
+    await act(async () => {
+      streamCallback({ id: 'req-3', principalId: 'user3', status: 'PENDING', resourcePath: 'main.db.t3' });
+    });
+    
+    await waitFor(() => expect(screen.getByText('user3')).toBeInTheDocument());
+  });
+
+  it('handles errors during fetch', async () => {
+    RequestService.getRequests.mockRejectedValue(new Error('Fetch failed'));
+    render(<ApproverDashboard />);
+    await waitFor(() => expect(screen.getByText('Fetch failed')).toBeInTheDocument());
   });
 });

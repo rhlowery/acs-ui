@@ -101,6 +101,13 @@ export const ApproverDashboard = () => {
                      </button>
                 </div>
             </div>
+ 
+            {error && (
+                <div className="glass" style={{ padding: '1rem', color: 'var(--error)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '4px', background: 'rgba(255, 100, 100, 0.1)' }}>
+                    <ShieldAlert size={20} />
+                    <span>{error}</span>
+                </div>
+            )}
 
             <div className="dashboard-tabs" style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '1.5rem' }}>
                 {['PENDING', 'APPROVED', 'REJECTED'].map(tab => (

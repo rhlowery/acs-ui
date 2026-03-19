@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Database, ChevronRight, CheckCircle2, Shield, Info } from 'lucide-react';
 import { CatalogTree } from '../components/catalog/CatalogTree';
+import { AccessRequestForm } from '../components/requests/AccessRequestForm';
 
 const Breadcrumbs = ({ path }) => {
   const parts = ['Catalog', ...path.filter(p => p)];
@@ -19,6 +20,7 @@ const Breadcrumbs = ({ path }) => {
 export const CatalogPage = () => {
   const [selectedNode, setSelectedNode] = useState(null);
   const [breadcrumbPath, setBreadcrumbPath] = useState([]);
+  const [showRequestForm, setShowRequestForm] = useState(false);
 
   const handleSelect = (node) => {
     setSelectedNode(node);
@@ -55,7 +57,7 @@ export const CatalogPage = () => {
                  <p style={{ color: 'var(--text-muted)' }}>{selectedNode.type.toUpperCase()} • {selectedNode.path || '/'}</p>
                </div>
                <div style={{ marginLeft: 'auto' }}>
-                 <button className="primary" onClick={() => alert(`Requesting access for ${selectedNode.name}`)}>
+                 <button className="primary" onClick={() => setShowRequestForm(true)}>
                    Request Access
                  </button>
                </div>
@@ -102,11 +104,21 @@ export const CatalogPage = () => {
             )}
           </div>
         ) : (
-          <div className="glass" style={{ padding: '4rem', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+          <div className="glass" style={{ padding: '4rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', flex: 1 }}>
             <Database size={64} style={{ opacity: 0.1, marginBottom: '2rem' }} />
-            <h2>Select a resource to browse</h2>
-            <p style={{ color: 'var(--text-muted)' }}>Use the catalog tree on the left to navigate through schemas and tables.</p>
+            <h3>No Resource Selected</h3>
+            <p style={{ color: 'var(--text-muted)' }}>Explore the Unity Catalog tree and select a resource to view details and request access.</p>
           </div>
+        )}
+
+        {showRequestForm && selectedNode && (
+          <AccessRequestForm 
+            node={selectedNode} 
+            onClose={() => setShowRequestForm(false)} 
+            onSuccess={() => {
+              // Optionally refresh or show success banner
+            }}
+          />
         )}
       </div>
     </div>

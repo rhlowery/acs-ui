@@ -7,6 +7,16 @@ export const RequestService = {
     return response.json();
   },
 
+  async submitRequest(request) {
+    const response = await fetch(API_BASE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request)
+    });
+    if (!response.ok) throw new Error('Failed to submit request');
+    return response.json();
+  },
+
   async approveRequest(id) {
     const response = await fetch(`${API_BASE}/${id}/approve`, { method: 'POST' });
     if (!response.ok) throw new Error('Failed to approve request');
