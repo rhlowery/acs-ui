@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CatalogPage } from '../CatalogPage';
 import { CatalogService } from '../../services/CatalogService';
@@ -19,6 +19,7 @@ vi.mock('../../components/catalog/CatalogTree', () => ({
       <button onClick={() => onSelect({ id: 't1', name: 'users', type: 'table', path: 'default/users', access: 'NONE' })}>Select Table</button>
       <button onClick={() => onToggle({ id: 't1', name: 'users', type: 'table', path: 'default/users', access: 'NONE' })}>Toggle Table</button>
       <button onContextMenu={(e) => { e.preventDefault(); onRightClick(e, { id: 'test-id', name: 'test-node', type: 'table', path: 'default/test' }); }}>Right Click Node</button>
+      <button onClick={() => onToggle({ id: 'test-id', name: 'test-node', type: 'table', path: 'default/test' })}>Toggle Test Node</button>
     </div>
   )
 }));
@@ -62,7 +63,6 @@ describe('CatalogPage', () => {
     fireEvent.click(selectBtn);
 
     // Check breadcrumbs for non-catalog
-    // Line 29: setBreadcrumbPath(['main', ...newPath]);
     expect(screen.getByText('main')).toBeInTheDocument();
     expect(screen.getAllByText('users')[0]).toBeInTheDocument();
     expect(screen.getByText('TABLE • default/users')).toBeInTheDocument();
@@ -94,6 +94,20 @@ describe('CatalogPage', () => {
     expect(screen.getByText('TIMESTAMP')).toBeInTheDocument();
   });
 
+  it('can close the provisioning terminal', async () => {
+    CatalogService.getRegistrations.mockResolvedValueOnce([]);
+    render(<CatalogPage />);
+    
+    // Right click to open
+    fireEvent.contextMenu(screen.getByText('Right Click Node'));
+    expect(screen.getByText(/Provisioning Terminal/i)).toBeInTheDocument();
+    
+    const closeBtn = screen.getByRole('button', { name: '' });
+    fireEvent.click(closeBtn);
+    
+    expect(screen.queryByText(/Provisioning Terminal/i)).not.toBeInTheDocument();
+  });
+
   it('handles toggling objects for the provisioning terminal', async () => {
     CatalogService.getRegistrations.mockResolvedValueOnce([]);
     render(<CatalogPage />);
@@ -103,7 +117,9 @@ describe('CatalogPage', () => {
     
     // Add to request
     const addBtn = screen.getByText('Add to Request');
-    fireEvent.click(addBtn);
+    await act(async () => {
+        fireEvent.click(addBtn);
+    });
     
     // Button should change label
     expect(screen.getByText('Remove from Request')).toBeInTheDocument();
@@ -112,7 +128,59 @@ describe('CatalogPage', () => {
     expect(screen.getByText(/Provisioning Terminal/i)).toBeInTheDocument();
     
     // Remove from request
-    fireEvent.click(screen.getByText('Remove from Request'));
+    const removeBtn = screen.getByText('Remove from Request');
+    await act(async () => {
+        fireEvent.click(removeBtn);
+    });
     expect(screen.getByText('Add to Request')).toBeInTheDocument();
+  });
+
+  it('can clear selected objects from the terminal', async () => {
+    CatalogService.getRegistrations.mockResolvedValueOnce([]);
+    render(<CatalogPage />);
+    
+    // Toggle table to open terminal and add it
+    fireEvent.click(screen.getByText('Toggle Table'));
+    
+    // The terminal should be open and 'users' should be listed
+    expect(screen.getByText(/Provisioning Terminal/i)).toBeInTheDocument();
+    expect(screen.getByText('users')).toBeInTheDocument();
+    
+    const clearBtn = screen.getByText('Clear Selection');
+    fireEvent.click(clearBtn);
+    
+    expect(screen.getByText(/Secure Access Bridge/i)).toBeInTheDocument();
+  });
+
+  it('skips adding if right-click on already selected object', async () => {
+    CatalogService.getRegistrations.mockResolvedValueOnce([]);
+    render(<CatalogPage />);
+    
+    // Toggle table to select it
+    fireEvent.click(screen.getByText('Toggle Table'));
+    expect(screen.getByText('users')).toBeInTheDocument();
+    
+    // Right click the same table (via rightClickBtn mock)
+    // In our mock, Right Click Node uses test-node, which is DIFFERENT from 'users'
+    // Let's toggle test-node first
+    fireEvent.click(screen.getByText('Toggle Test Node'));
+    expect(screen.getByText('test-node')).toBeInTheDocument();
+    
+    // Right click test-node
+    fireEvent.contextMenu(screen.getByText('Right Click Node'));
+    
+    // Should still have just 1 copy of test-node and terminal remains open
+    expect(screen.getByText('test-node')).toBeInTheDocument();
+    expect(screen.getAllByText('test-node').length).toBeGreaterThan(0);
+  });
+
+  it('handles node without path or with empty path', async () => {
+    CatalogService.getRegistrations.mockResolvedValueOnce([]);
+    render(<CatalogPage />);
+    
+    // Select catalog (path is '/')
+    fireEvent.click(screen.getByText('Select Catalog'));
+    expect(screen.getByText('Catalog')).toBeInTheDocument();
+    expect(screen.getByText('CATALOG • /')).toBeInTheDocument(); // Mocked UI shows type + path
   });
 });

@@ -31,7 +31,7 @@ Feature: Advanced Access Request Submission
       | developer    | app-dev-svc   |
 
   Scenario Outline: Validating and submitting a request
-    Given the user has selected targets and principals
+    Given the user has selected targets and <principalCount> principals
     When the user enters "<justification>" as the justification
     And selects permission level "<permission>"
     And clicks the "Submit Provisioning Request" button
@@ -42,9 +42,13 @@ Feature: Advanced Access Request Submission
     And a "<result>" toast should be displayed
 
     Examples:
-      | justification               | permission | result  |
-      | Testing production parity   | READ       | Success |
-      | Bad J                       | WRITE      | Error   |
+      | principalCount | justification               | permission | result  |
+      | 1              | Testing production parity   | READ       | Success |
+      | 1              | Valid justification text    | WRITE      | Success |
+      | 0              | Valid justification text    | READ       | Error   |
+      | 1              | short                       | READ       | Error   |
+      | 1              | <tooLongJustification>      | READ       | Error   |
+      | 1              | Valid justification text    | NONE       | Error   |
 
   Scenario Outline: Setting a time-limited access duration
     Given the user is configuring an access request in the Provisioning Terminal

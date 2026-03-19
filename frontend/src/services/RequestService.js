@@ -24,8 +24,14 @@ export const RequestService = {
         });
 
         if (!res.ok) {
-            const error = await res.json();
-            throw new Error(error.message || 'Submission failed');
+            let errorMessage = 'Submission failed';
+            try {
+                const error = await res.json();
+                errorMessage = error.message || errorMessage;
+            } catch (e) {
+                // Ignore JSON parse error if body is empty
+            }
+            throw new Error(errorMessage);
         }
 
         return await res.json();

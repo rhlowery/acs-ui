@@ -27,13 +27,46 @@ describe('RequestService', () => {
         expect(capturedPayload.resources[0].tableName).toBe('t1');
     });
 
-    it('handles submission error', async () => {
+    it('handles submission error with fallback message', async () => {
         server.use(
             http.post('/api/storage/requests', () => {
-                return HttpResponse.json({ message: 'Validation failed' }, { status: 400 });
+                return new HttpResponse(null, { status: 400 });
             })
         );
 
-        await expect(RequestService.submitRequest({ objects: [] })).rejects.toThrow('Validation failed');
+        await expect(RequestService.submitRequest({ objects: [] })).rejects.toThrow('Submission failed');
+    });
+
+    it('handles submission error with custom message', async () => {
+        server.use(
+            http.post('/api/storage/requests', () => {
+                return HttpResponse.json({ message: 'Custom Backend Error' }, { status: 400 });
+            })
+        );
+
+        await expect(RequestService.submitRequest({ objects: [] })).rejects.toThrow('Custom Backend Error');
+    });
+
+    it('uses default catalog and schema if missing', async () => {
+        let capturedPayload;
+        server.use(
+            http.post('/api/storage/requests', async ({ request }) => {
+                capturedPayload = await request.json();
+                return HttpResponse.json({ id: 'res-2' });
+            })
+        );
+
+        const mockRequest = {
+            requesterId: 'me',
+            principals: ['u1'],
+            objects: [{ type: 'table', name: 't1' }], // Missing catalog and schema
+            permissions: ['READ'],
+            justification: 'testing',
+            timeConstraint: { type: 'PERMANENT' }
+        };
+
+        await RequestService.submitRequest(mockRequest);
+        expect(capturedPayload.resources[0].catalogName).toBe('main');
+        expect(capturedPayload.resources[0].schemaName).toBe('default');
     });
 });

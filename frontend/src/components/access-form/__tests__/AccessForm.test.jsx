@@ -162,4 +162,39 @@ describe('AccessForm', () => {
         fireEvent.click(submitBtn);
         expect(global.alert).toHaveBeenCalledWith('Justification must be less than 1000 characters.');
     });
+    it('renders multiple selected objects with correct icons', async () => {
+        const multipleObjects = [
+            { id: 'o1', name: 'cat1', type: 'catalog' },
+            { id: 'o2', name: 'sch1', type: 'schema' },
+            { id: 'o3', name: 'tab1', type: 'table' }
+        ];
+        render(<AccessForm selectedObjects={multipleObjects} />);
+        
+        await waitFor(() => expect(screen.getByText(/Requesting access to 3 objects/i)).toBeInTheDocument());
+        expect(screen.getByText('cat1')).toBeInTheDocument();
+        expect(screen.getByText('sch1')).toBeInTheDocument();
+        expect(screen.getByText('tab1')).toBeInTheDocument();
+        
+        // Check for catalog, schema, table labels (from NodeIcon or SelectedObjectsList)
+        expect(screen.getByText('catalog:')).toBeInTheDocument();
+        expect(screen.getByText('schema:')).toBeInTheDocument();
+        expect(screen.getByText('table:')).toBeInTheDocument();
+    });
+
+    it('handles mandatory date fields validation when RANGE is selected', async () => {
+        render(<AccessForm selectedObjects={mockSelectedObjects} />);
+        await waitFor(() => expect(screen.getByText('Analyst Jane')).toBeInTheDocument());
+
+        fireEvent.click(screen.getByLabelText(/Date Range/i));
+        
+        fireEvent.click(screen.getByText('Analyst Jane'));
+        fireEvent.click(screen.getByTestId('permission-toggle-READ'));
+        fireEvent.change(screen.getByTestId('justification-input'), { target: { value: 'Valid justification here' } });
+        
+        const submitBtn = screen.getByTestId('submit-request-button');
+        
+        // Case: No start/end date
+        fireEvent.click(submitBtn);
+        expect(global.alert).toHaveBeenCalledWith('Please provide both start and end dates.');
+    });
 });
