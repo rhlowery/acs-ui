@@ -45,7 +45,7 @@ describe('AccessRequestForm', () => {
         
         expect(window.alert).toHaveBeenCalledWith('Please select at least one privilege.');
         
-        fireEvent.click(screen.getByLabelText('SELECT'));
+        fireEvent.click(screen.getByText('SELECT', { selector: 'button' }));
         fireEvent.submit(form);
         expect(window.alert).toHaveBeenCalledWith('Please provide a justification.');
     });
@@ -57,9 +57,9 @@ describe('AccessRequestForm', () => {
         
         render(<AccessRequestForm node={mockNode} onClose={onClose} onSuccess={onSuccess} />);
         
-        fireEvent.click(screen.getByLabelText('SELECT'));
-        fireEvent.click(screen.getByLabelText('UPDATE'));
-        fireEvent.change(screen.getByPlaceholderText(/Why do you need/), { target: { value: 'need data for report' } });
+        fireEvent.click(screen.getByText('SELECT', { selector: 'button' }));
+        fireEvent.click(screen.getByText('UPDATE', { selector: 'button' }));
+        fireEvent.change(screen.getByPlaceholderText(/Please explain why/), { target: { value: 'need data for report' } });
         fireEvent.change(screen.getByLabelText(/Expiration/), { target: { value: '2026-12-31T23:59' } });
         
         fireEvent.click(screen.getByText('Submit Request'));
@@ -74,8 +74,8 @@ describe('AccessRequestForm', () => {
         RequestService.submitRequest.mockRejectedValue(new Error('Network error'));
         render(<AccessRequestForm node={mockNode} onClose={() => {}} />);
         
-        fireEvent.click(screen.getByLabelText('SELECT'));
-        fireEvent.change(screen.getByPlaceholderText(/Why do you need/), { target: { value: 'test' } });
+        fireEvent.click(screen.getByText('SELECT', { selector: 'button' }));
+        fireEvent.change(screen.getByPlaceholderText(/Please explain why/), { target: { value: 'test' } });
         fireEvent.click(screen.getByText('Submit Request'));
         
         await waitFor(() => expect(window.alert).toHaveBeenCalledWith('Error: Network error'));
@@ -83,12 +83,12 @@ describe('AccessRequestForm', () => {
 
     it('toggles privileges correctly', () => {
         render(<AccessRequestForm node={mockNode} onClose={() => {}} />);
-        const selectBox = screen.getByLabelText('SELECT');
+        const selectBox = screen.getByText('SELECT', { selector: 'button' });
         
         fireEvent.click(selectBox);
-        expect(selectBox.checked).toBe(true);
+        expect(selectBox.className).toContain('text-primary');
         
         fireEvent.click(selectBox);
-        expect(selectBox.checked).toBe(false);
+        expect(selectBox.className).not.toContain('text-primary');
     });
 });

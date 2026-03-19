@@ -1,11 +1,27 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SettingsPage } from '../SettingsPage';
+import { useTheme } from '../../context/ThemeContext';
+
+vi.mock('../../context/ThemeContext', () => ({
+    useTheme: vi.fn()
+}));
 
 vi.stubGlobal('alert', vi.fn());
 
 describe('SettingsPage', () => {
+    let toggleMock;
+
+    beforeEach(() => {
+        toggleMock = vi.fn();
+        useTheme.mockReturnValue({
+            isDarkMode: true,
+            toggleDarkMode: toggleMock
+        });
+        vi.clearAllMocks();
+    });
+
     it('renders profile and system sections', () => {
         render(<SettingsPage />);
         expect(screen.getByText('Profile Information')).toBeInTheDocument();
@@ -17,7 +33,7 @@ describe('SettingsPage', () => {
         render(<SettingsPage />);
         const themeBtn = screen.getByText('Dark');
         fireEvent.click(themeBtn);
-        expect(screen.getByText('Light')).toBeInTheDocument();
+        expect(toggleMock).toHaveBeenCalled();
     });
 
     it('toggles checkboxes', () => {

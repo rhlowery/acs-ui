@@ -79,138 +79,164 @@ export const ApproverDashboard = () => {
     const filteredRequests = requests.filter(r => r.status === selectedTab || (selectedTab === 'PENDING' && !r.status));
 
     return (
-        <div className="dashboard-container" style={{ padding: '2rem' }}>
-            <div className="dashboard-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
+        <div className="p-8 max-w-7xl mx-auto">
+            <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
                 <div>
-                    <h1 style={{ margin: 0 }}>Approver Dashboard</h1>
-                    <p style={{ color: 'var(--text-muted)' }}>Manage and review access requests for your catalogs</p>
+                    <h1 className="text-3xl font-bold font-outfit tracking-tight">Approver Dashboard</h1>
+                    <p className="text-[var(--text-muted)] mt-1">Manage and review access requests for your catalogs</p>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                     <div className="glass" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '2rem' }}>
-                        <span style={{ fontSize: '0.875rem' }}>Live Feed</span>
-                        <input 
-                            type="checkbox" 
-                            checked={isLiveEnabled} 
-                            onChange={(e) => setIsLiveEnabled(e.target.checked)} 
-                            style={{ cursor: 'pointer' }}
-                        />
-                         {isLiveEnabled && <Radio size={14} color="var(--error)" className="pulse" />}
+                <div className="flex items-center gap-4">
+                     <div className="glass px-4 py-2 flex items-center gap-3">
+                        <span className="text-sm font-medium">Live Feed</span>
+                        <div className="relative inline-flex items-center cursor-pointer">
+                            <input 
+                                type="checkbox" 
+                                checked={isLiveEnabled} 
+                                onChange={(e) => setIsLiveEnabled(e.target.checked)} 
+                                className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                        </div>
+                         {isLiveEnabled && <Radio size={14} className="text-danger pulse" />}
                      </div>
-                     <button className="primary" onClick={fetchRequests} style={{ padding: '0.5rem 1rem' }}>
-                        <Activity size={16} style={{ marginRight: '0.5rem' }} /> Refresh
+                     <button className="btn-primary flex items-center gap-2" onClick={fetchRequests}>
+                        <Activity size={18} /> Refresh
                      </button>
                 </div>
-            </div>
+            </header>
  
             {error && (
-                <div className="glass" style={{ padding: '1rem', color: 'var(--error)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '4px', background: 'rgba(255, 100, 100, 0.1)' }}>
+                <div className="glass p-4 border-l-4 border-danger bg-danger/10 text-danger mb-6 flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300">
                     <ShieldAlert size={20} />
-                    <span>{error}</span>
+                    <span className="font-medium">{error}</span>
                 </div>
             )}
 
-            <div className="dashboard-tabs" style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '1.5rem' }}>
+            <div className="flex gap-4 border-b border-[var(--border)] mb-8 overflow-x-auto pb-px">
                 {['PENDING', 'APPROVED', 'REJECTED'].map(tab => (
                     <button 
                         key={tab}
                         onClick={() => setSelectedTab(tab)}
-                        style={{
-                            padding: '0.75rem 1.5rem',
-                            background: 'none',
-                            border: 'none',
-                            color: selectedTab === tab ? 'white' : 'var(--text-muted)',
-                            borderBottom: selectedTab === tab ? '2px solid var(--primary)' : 'none',
-                            cursor: 'pointer',
-                            fontWeight: selectedTab === tab ? 'bold' : 'normal',
-                            transition: 'all 0.2s'
-                        }}
+                        className={`px-6 py-3 text-sm font-bold transition-all border-b-2 ${
+                            selectedTab === tab 
+                            ? 'text-[var(--text)] border-[var(--primary)]' 
+                            : 'text-[var(--text-muted)] border-transparent hover:text-[var(--text)]'
+                        }`}
                     >
                         {tab}
                     </button>
                 ))}
             </div>
 
-            <div className="glass table-container" style={{ padding: '1rem', overflowX: 'auto' }}>
-                <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
-                    <thead>
-                        <tr style={{ color: 'var(--text-muted)', fontSize: '0.875rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                            <th style={{ padding: '1rem' }}>Principal</th>
-                            <th style={{ padding: '1rem' }}>Resource</th>
-                            <th style={{ padding: '1rem' }}>Permission</th>
-                            <th style={{ padding: '1rem' }}>Justification</th>
-                            <th style={{ padding: '1rem' }}>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredRequests.map(req => (
-                            <tr key={req.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }} className="table-row">
-                                <td style={{ padding: '1rem' }}>{req.principalId}</td>
-                                <td style={{ padding: '1rem' }}>{req.resourcePath}</td>
-                                <td style={{ padding: '1rem' }}>
-                                    <span className="badge glass" style={{ padding: '0.2rem 0.5rem', borderRadius: '1rem', fontSize: '0.75rem', background: 'rgba(52, 191, 191, 0.1)' }}>
-                                        {req.permission}
-                                    </span>
-                                </td>
-                                <td style={{ padding: '1rem', maxWidth: '300px' }}>
-                                    <p style={{ margin: 0, fontSize: '0.875rem', opacity: 0.8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div className="glass overflow-hidden shadow-xl border border-[var(--border)]">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="text-[var(--text-muted)] text-sm uppercase tracking-wider border-b border-[var(--border)] bg-black/5 dark:bg-white/5">
+                                <th className="p-4 font-bold">Principal</th>
+                                <th className="p-4 font-bold">Resource</th>
+                                <th className="p-4 font-bold">Permission</th>
+                                <th className="p-4 font-bold">Justification</th>
+                                <th className="p-4 font-bold text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredRequests.map(req => (
+                                <tr key={req.id} className="border-b border-[var(--border)] group hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                                    <td className="p-4 font-medium">{req.principalId}</td>
+                                    <td className="p-4 font-mono text-xs opacity-80">{req.resourcePath}</td>
+                                    <td className="p-4">
+                                        <span className="badge-success bg-primary/10 text-primary border-primary/20 px-2.5 py-1 text-[10px] font-bold">
+                                            {req.permission}
+                                        </span>
+                                    </td>
+                                    <td className="p-4 max-w-xs truncate text-sm opacity-70">
                                         {req.justification}
-                                    </p>
-                                </td>
-                                <td style={{ padding: '1rem' }}>
-                                    {selectedTab === 'PENDING' ? (
-                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                            <button 
-                                                onClick={() => handleApprove(req.id)}
-                                                className="primary" 
-                                                style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem' }}
-                                                title="Approve access"
-                                            >
-                                                <CheckCircle2 size={14} />
-                                            </button>
-                                            <button 
-                                                onClick={() => handleRejectClick(req.id)}
-                                                style={{ padding: '0.4rem 0.8rem', background: 'rgba(239, 68, 68, 0.2)', border: '1px solid var(--error)', color: '#ef4444', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}
-                                                title="Reject access"
-                                            >
-                                                <XCircle size={14} />
-                                            </button>
+                                    </td>
+                                    <td className="p-4">
+                                        {selectedTab === 'PENDING' ? (
+                                            <div className="flex items-center justify-center gap-2">
+                                                <button 
+                                                    onClick={() => handleApprove(req.id)}
+                                                    className="p-2 bg-success/20 text-success border border-success/30 rounded-lg hover:bg-success hover:text-white transition-all shadow-sm" 
+                                                    title="Approve access"
+                                                >
+                                                    <CheckCircle2 size={16} />
+                                                </button>
+                                                <button 
+                                                    onClick={() => handleRejectClick(req.id)}
+                                                    className="p-2 bg-danger/20 text-danger border border-danger/30 rounded-lg hover:bg-danger hover:text-white transition-all shadow-sm"
+                                                    title="Reject access"
+                                                >
+                                                    <XCircle size={16} />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col items-center gap-1 opacity-70">
+                                                {selectedTab === 'APPROVED' ? (
+                                                    <span className="text-success text-xs font-bold flex items-center gap-1.5 uppercase tracking-tighter">
+                                                        <CheckCircle2 size={14} /> Approved
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-danger text-xs font-bold flex items-center gap-1.5 uppercase tracking-tighter">
+                                                        <XCircle size={14} /> Rejected
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                            {filteredRequests.length === 0 && (
+                                <tr>
+                                    <td colSpan="5" className="text-center py-20 opacity-30">
+                                        <div className="flex flex-col items-center">
+                                            <Clock size={64} className="mb-4" />
+                                            <p className="text-lg font-medium italic">No {selectedTab.toLowerCase()} requests found.</p>
                                         </div>
-                                    ) : (
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', opacity: 0.7 }}>
-                                            {selectedTab === 'APPROVED' ? <CheckCircle2 size={14} color="var(--success)" /> : <XCircle size={14} color="var(--error)" />}
-                                            <span style={{ fontSize: '0.75rem' }}>{req.status}</span>
-                                        </div>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                        {filteredRequests.length === 0 && (
-                            <tr>
-                                <td colSpan="5" style={{ textAlign: 'center', padding: '4rem', opacity: 0.3 }}>
-                                    <Clock size={48} style={{ marginBottom: '1rem' }} />
-                                    <p>No {selectedTab.toLowerCase()} requests found.</p>
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             {/* Rejection Modal */}
             {showRejectionModal && (
-                <div className="modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
-                    <div className="glass modal-content" style={{ padding: '2rem', width: '400px', borderRadius: '1rem', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <h3>Confirm Rejection</h3>
-                        <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Provide a reason for rejecting this request.</p>
-                        <textarea 
-                            value={rejectionReason}
-                            onChange={(e) => setRejectionReason(e.target.value)}
-                            placeholder="e.g., Access not required for your role."
-                            style={{ width: '100%', height: '100px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '0.5rem', borderRadius: '4px', marginBottom: '1.5rem', resize: 'none' }}
-                        />
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-                            <button onClick={() => setShowRejectionModal(false)} style={{ background: 'none', color: 'white', border: 'none', cursor: 'pointer' }}>Cancel</button>
-                            <button onClick={handleConfirmReject} className="primary" style={{ padding: '0.5rem 1.5rem' }}>Reject</button>
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[100] animate-in fade-in duration-300 p-4">
+                    <div className="glass max-w-md w-full p-8 shadow-2xl border border-white/10 flex flex-col gap-6 animate-in zoom-in-95 duration-300" onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center gap-3 text-danger">
+                            <XCircle size={28} />
+                            <h3 className="text-2xl font-bold font-outfit">Confirm Rejection</h3>
+                        </div>
+                        <p className="text-[var(--text-muted)] text-sm -mt-2">Provide a mandatory reason for rejecting this access request.</p>
+                        
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold uppercase tracking-widest opacity-60 flex items-center gap-2">
+                                <MessageSquare size={14} /> Reason for Rejection
+                            </label>
+                            <textarea 
+                                value={rejectionReason}
+                                onChange={(e) => setRejectionReason(e.target.value)}
+                                placeholder="e.g., Request doesn't follow principle of least privilege..."
+                                className="w-full h-32 bg-white/5 dark:bg-black/20 border border-[var(--border)] rounded-xl p-4 text-sm focus:ring-2 ring-danger/30 outline-none transition-all resize-none shadow-inner"
+                            />
+                        </div>
+
+                        <div className="flex justify-end items-center gap-4 mt-2">
+                            <button 
+                                onClick={() => setShowRejectionModal(false)} 
+                                className="text-sm font-medium hover:text-danger underline-offset-4 hover:underline transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={handleConfirmReject} 
+                                className="btn-primary bg-danger hover:bg-danger/90 px-8"
+                            >
+                                Reject Access
+                            </button>
                         </div>
                     </div>
                 </div>

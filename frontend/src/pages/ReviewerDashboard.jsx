@@ -76,30 +76,33 @@ export const ReviewerDashboard = () => {
     };
 
     return (
-        <div className="dashboard-container" style={{ padding: '2rem' }}>
-            <div className="dashboard-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
+        <div className="p-8 max-w-7xl mx-auto space-y-8">
+            <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 style={{ margin: 0 }}>Reviewer & Auditor Dashboard</h1>
-                    <p style={{ color: 'var(--text-muted)' }}>Audit trails, request verification, and compliance monitoring</p>
+                    <h1 className="text-3xl font-bold font-outfit tracking-tight">Reviewer & Auditor Dashboard</h1>
+                    <p className="text-[var(--text-muted)] mt-1">Audit trails, request verification, and compliance monitoring</p>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div className="glass" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '2rem' }}>
-                        <span style={{ fontSize: '0.875rem' }}>Live Stream</span>
-                        <input 
-                            type="checkbox" 
-                            checked={isLiveEnabled} 
-                            onChange={(e) => setIsLiveEnabled(e.target.checked)} 
-                            style={{ cursor: 'pointer' }}
-                        />
-                         {isLiveEnabled && <Activity size={14} color="var(--success)" className="pulse" />}
+                <div className="flex items-center gap-4">
+                    <div className="glass px-4 py-2 flex items-center gap-3">
+                        <span className="text-sm font-medium">Live Stream</span>
+                        <div className="relative inline-flex items-center cursor-pointer">
+                            <input 
+                                type="checkbox" 
+                                checked={isLiveEnabled} 
+                                onChange={(e) => setIsLiveEnabled(e.target.checked)} 
+                                className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                        </div>
+                         {isLiveEnabled && <Activity size={14} className="text-success pulse" />}
                      </div>
-                     <button className="primary" onClick={selectedTab === 'AUDIT_LOG' ? fetchAuditLogs : fetchRequests}>
-                        <RefreshCcw size={16} style={{ marginRight: '0.5rem' }} /> Refresh
+                     <button className="btn-primary flex items-center gap-2" onClick={selectedTab === 'AUDIT_LOG' ? fetchAuditLogs : fetchRequests}>
+                        <RefreshCcw size={18} /> Refresh
                      </button>
                 </div>
-            </div>
+            </header>
 
-            <div className="dashboard-tabs" style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '1.5rem' }}>
+            <div className="flex gap-4 border-b border-[var(--border)] overflow-x-auto pb-px">
                 {[
                     { id: 'AUDIT_LOG', label: 'Audit Log', icon: History },
                     { id: 'REQUESTS', label: 'Access Requests', icon: TrendingUp },
@@ -108,107 +111,116 @@ export const ReviewerDashboard = () => {
                     <button 
                         key={tab.id}
                         onClick={() => setSelectedTab(tab.id)}
-                        style={{
-                            padding: '0.75rem 1.5rem',
-                            background: 'none',
-                            border: 'none',
-                            color: selectedTab === tab.id ? 'white' : 'var(--text-muted)',
-                            borderBottom: selectedTab === tab.id ? '2px solid var(--primary)' : 'none',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            fontWeight: selectedTab === tab.id ? 'bold' : 'normal'
-                        }}
+                        className={`px-6 py-4 text-sm font-bold transition-all border-b-2 flex items-center gap-2.5 whitespace-nowrap ${
+                            selectedTab === tab.id 
+                            ? 'text-[var(--text)] border-[var(--primary)] bg-white/5 dark:bg-white/5' 
+                            : 'text-[var(--text-muted)] border-transparent hover:text-[var(--text)] hover:bg-white/5'
+                        }`}
                     >
-                        <tab.icon size={16} />
+                        <tab.icon size={18} className={selectedTab === tab.id ? 'text-[var(--primary)]' : ''} />
                         {tab.label}
                     </button>
                 ))}
             </div>
 
-            <div className="glass table-container" style={{ padding: '1rem', overflowX: 'auto', minHeight: '400px' }}>
-                {selectedTab === 'AUDIT_LOG' && (
-                    <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
-                        <thead>
-                            <tr style={{ color: 'var(--text-muted)', fontSize: '0.875rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                                <th style={{ padding: '1rem' }}>Timestamp</th>
-                                <th style={{ padding: '1rem' }}>Principal</th>
-                                <th style={{ padding: '1rem' }}>Action</th>
-                                <th style={{ padding: '1rem' }}>Resource</th>
-                                <th style={{ padding: '1rem' }}>Result</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {auditLogs.map((log, idx) => (
-                                <tr key={log.id || idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                    <td style={{ padding: '1rem', fontSize: '0.875rem' }}>{new Date(log.timestamp).toLocaleString()}</td>
-                                    <td style={{ padding: '1rem' }}>{log.principalId}</td>
-                                    <td style={{ padding: '1rem' }}>
-                                        <span className="badge" style={{ padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', background: 'rgba(255,255,255,0.1)' }}>
-                                            {log.action}
-                                        </span>
-                                    </td>
-                                    <td style={{ padding: '1rem' }}>{log.resourcePath}</td>
-                                    <td style={{ padding: '1rem' }}>
-                                        {log.result === 'SUCCESS' ? 
-                                            <CheckCircle2 size={16} color="var(--success)" /> : 
-                                            <AlertTriangle size={16} color="var(--error)" />
-                                        }
-                                    </td>
+            <div className="glass overflow-hidden shadow-2xl border border-[var(--border)] min-h-[400px]">
+                <div className="overflow-x-auto">
+                    {selectedTab === 'AUDIT_LOG' && (
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="text-[var(--text-muted)] text-sm uppercase tracking-wider border-b border-[var(--border)] bg-black/5 dark:bg-white/5">
+                                    <th className="p-4 font-bold">Timestamp</th>
+                                    <th className="p-4 font-bold">Principal</th>
+                                    <th className="p-4 font-bold">Action</th>
+                                    <th className="p-4 font-bold">Resource</th>
+                                    <th className="p-4 font-bold text-center">Result</th>
                                 </tr>
-                            ))}
-                            {auditLogs.length === 0 && !isLoading && (
-                                <tr>
-                                    <td colSpan="5" style={{ textAlign: 'center', padding: '4rem', opacity: 0.3 }}>
-                                        <History size={48} style={{ marginBottom: '1rem' }} />
-                                        <p>No audit logs available.</p>
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                )}
+                            </thead>
+                            <tbody className="divide-y divide-[var(--border)]">
+                                {auditLogs.map((log, idx) => (
+                                    <tr key={log.id || idx} className="hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                                        <td className="p-4 text-sm font-mono opacity-80">{new Date(log.timestamp).toLocaleString()}</td>
+                                        <td className="p-4 font-medium">{log.principalId}</td>
+                                        <td className="p-4">
+                                            <span className="bg-white/10 dark:bg-black/20 border border-[var(--border)] px-2.5 py-1 rounded text-[10px] font-bold tracking-widest uppercase">
+                                                {log.action}
+                                            </span>
+                                        </td>
+                                        <td className="p-4 text-sm opacity-70 truncate max-w-xs">{log.resourcePath}</td>
+                                        <td className="p-4">
+                                            <div className="flex justify-center">
+                                                {log.result === 'SUCCESS' ? 
+                                                    <CheckCircle2 size={20} className="text-success shadow-success/20" /> : 
+                                                    <AlertTriangle size={20} className="text-danger" />
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {auditLogs.length === 0 && !isLoading && (
+                                    <tr>
+                                        <td colSpan="5" className="text-center py-24 opacity-30">
+                                            <div className="flex flex-col items-center">
+                                                <History size={64} className="mb-4" />
+                                                <p className="text-xl font-medium italic">No audit logs available.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    )}
 
-                {selectedTab === 'REQUESTS' && (
-                    <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
-                        <thead>
-                            <tr style={{ color: 'var(--text-muted)', fontSize: '0.875rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                                <th style={{ padding: '1rem' }}>ID</th>
-                                <th style={{ padding: '1rem' }}>Status</th>
-                                <th style={{ padding: '1rem' }}>Resource</th>
-                                <th style={{ padding: '1rem' }}>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {requests.map(req => (
-                                <tr key={req.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                    <td style={{ padding: '1rem', fontSize: '0.875rem' }}>{req.id}</td>
-                                    <td style={{ padding: '1rem' }}>
-                                        <span style={{ color: req.status === 'APPROVED' ? 'var(--success)' : 'var(--text-muted)' }}>
-                                            {req.status}
-                                        </span>
-                                    </td>
-                                    <td style={{ padding: '1rem' }}>{req.resourcePath}</td>
-                                    <td style={{ padding: '1rem' }}>
-                                        <button onClick={() => handleVerify(req.id)} style={{ padding: '0.4rem 0.8rem', background: 'var(--primary)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}>
-                                            Verify Integrity
-                                        </button>
-                                    </td>
+                    {selectedTab === 'REQUESTS' && (
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="text-[var(--text-muted)] text-sm uppercase tracking-wider border-b border-[var(--border)] bg-black/5 dark:bg-white/5">
+                                    <th className="p-4 font-bold">ID</th>
+                                    <th className="p-4 font-bold">Status</th>
+                                    <th className="p-4 font-bold">Resource</th>
+                                    <th className="p-4 font-bold text-center">Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                )}
+                            </thead>
+                            <tbody className="divide-y divide-[var(--border)]">
+                                {requests.map(req => (
+                                    <tr key={req.id} className="hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                                        <td className="p-4 text-xs font-mono opacity-60">{req.id}</td>
+                                        <td className="p-4">
+                                            <span className={`text-xs font-bold uppercase ${req.status === 'APPROVED' ? 'text-success' : 'text-[var(--text-muted)]'}`}>
+                                                {req.status}
+                                            </span>
+                                        </td>
+                                        <td className="p-4 font-medium">{req.resourcePath}</td>
+                                        <td className="p-4">
+                                            <div className="flex justify-center">
+                                                <button onClick={() => handleVerify(req.id)} className="btn-secondary text-[10px] uppercase font-bold tracking-widest px-4 py-2 hover:border-primary/50 hover:text-primary transition-all">
+                                                    Verify Integrity
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
 
-                {selectedTab === 'INTEGRITY' && (
-                    <div style={{ padding: '4rem', textAlign: 'center' }}>
-                        <Database size={64} style={{ opacity: 0.1, marginBottom: '2rem' }} />
-                        <h3>Catalog Integrity Checker</h3>
-                        <p style={{ color: 'var(--text-muted)' }}>Select a catalog resource from the tree to perform a deep-scan verification.</p>
-                        <p style={{ fontSize: '0.875rem', marginTop: '1rem' }}>Feature coming soon: Automated Policy Drift Detection</p>
-                    </div>
-                )}
+                    {selectedTab === 'INTEGRITY' && (
+                        <div className="py-24 text-center space-y-6">
+                            <div className="relative inline-block">
+                                <Database size={80} className="opacity-10 mx-auto" />
+                                <TrendingUp size={32} className="absolute -bottom-2 -right-2 text-primary pulse" />
+                            </div>
+                            <div className="max-w-md mx-auto space-y-3 px-6">
+                                <h3 className="text-2xl font-bold font-outfit">Catalog Integrity Checker</h3>
+                                <p className="text-[var(--text-muted)] text-sm">Select a catalog resource from the tree to perform a deep-scan verification and detect policy drift in real-time.</p>
+                                <div className="pt-4 flex items-center justify-center gap-3">
+                                    <span className="w-2 h-2 bg-primary rounded-full pulse"></span>
+                                    <span className="text-xs font-bold uppercase tracking-widest opacity-60">System Ready for Scan</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
