@@ -1,4 +1,6 @@
-const API_BASE = '/api';
+import { getApiUrl } from '../config';
+
+const API_BASE = getApiUrl('/api');
 
 export const UserService = {
   async getUsers() {

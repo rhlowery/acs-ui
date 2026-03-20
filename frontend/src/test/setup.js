@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+window.ACS_CONFIG = { apiUrl: '' };
 import { beforeAll, afterEach, afterAll } from 'vitest';
 import { setupServer } from 'msw/node';
 

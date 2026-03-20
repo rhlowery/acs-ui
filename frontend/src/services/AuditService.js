@@ -1,4 +1,6 @@
-const API_BASE = '/api/audit/log';
+import { getApiUrl } from '../config';
+
+const API_BASE = getApiUrl('/api/audit/log');
 
 export const AuditService = {
   async getLogs() {

@@ -34,3 +34,7 @@ data:
           document.getElementById('greeting').textContent = 'Error loading greeting';
         });
     });
+  config.js: |
+    window.ACS_CONFIG = {
+      apiUrl: {{ .Values.config.acsBackendUrl | quote }}
+    };

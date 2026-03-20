@@ -1,4 +1,6 @@
-const API_BASE = '/api/catalog';
+import { getApiUrl } from '../config';
+
+const API_BASE = getApiUrl('/api/catalog');
 
 export const CatalogService = {
   async getRegistrations() {

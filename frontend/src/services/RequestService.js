@@ -1,4 +1,6 @@
-const API_BASE = '/api/storage/requests';
+import { getApiUrl } from '../config';
+
+const API_BASE = getApiUrl('/api/storage/requests');
 
 export const RequestService = {
   async getRequests() {

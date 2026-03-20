@@ -22,6 +22,7 @@ import { ReviewerDashboard } from './pages/ReviewerDashboard';
 import { SettingsPage } from './pages/SettingsPage';
 import { UserGroupManagement } from './pages/UserGroupManagement';
 import { AuthService } from './services/AuthService';
+import { getApiUrl } from './config';
 
 const Sidebar = ({ activeTab, setActiveTab }) => (
   <aside className="w-[260px] bg-[var(--sidebar-bg)] border-r border-[var(--border)] p-6 flex flex-col gap-8 sticky top-0 h-screen transition-all duration-300">
@@ -154,7 +155,7 @@ const App = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userRes = await fetch('/api/auth/me');
+        const userRes = await fetch(getApiUrl('/api/auth/me'));
         if (userRes.ok) {
           const userData = await userRes.json();
           setUser(userData);
@@ -167,7 +168,7 @@ const App = () => {
       }
       
       try {
-        const reqRes = await fetch('/api/storage/requests');
+        const reqRes = await fetch(getApiUrl('/api/storage/requests'));
         if (reqRes.ok) {
           const reqData = await reqRes.json();
           setRequests(reqData || []);
