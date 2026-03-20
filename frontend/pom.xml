@@ -10,6 +10,18 @@
     <artifactId>frontend</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <github.repository>rhlowery/acs-ui</github.repository>
+        <github.branch>gh-pages</github.branch>
+    </properties>
+
+    <distributionManagement>
+        <site>
+            <id>github</id>
+            <url>scm:git:git@github.com:${github.repository}.git</url>
+        </site>
+    </distributionManagement>
+
     <build>
         <plugins>
             <plugin>
@@ -46,7 +58,44 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Copy build output to site directory for deployment -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-build-to-site</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/site</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>build</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Deploy the site directory to GitHub Pages -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-publish-plugin</artifactId>
+                <version>3.2.1</version>
+                <configuration>
+                    <scmBranch>${github.branch}</scmBranch>
+                    <pubScmUrl>scm:git:git@github.com:${github.repository}.git</pubScmUrl>
+                    <content>${project.build.directory}/site</content>
+                    <checkoutDirectory>${project.build.directory}/scmpublish</checkoutDirectory>
+                    <tryUpdate>true</tryUpdate>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
 </project>
